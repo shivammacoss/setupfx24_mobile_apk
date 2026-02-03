@@ -31,6 +31,7 @@ const OrderBookScreen = ({ navigation }) => {
   const [closedTrades, setClosedTrades] = useState([]);
   const [livePrices, setLivePrices] = useState({});
   const [showAccountPicker, setShowAccountPicker] = useState(false);
+  const [historyFilter, setHistoryFilter] = useState('all'); // all, today, week, month, year
 
   useEffect(() => {
     loadUserAndData();
@@ -235,6 +236,36 @@ const OrderBookScreen = ({ navigation }) => {
 
   const getTotalPnl = () => {
     return openTrades.reduce((sum, trade) => sum + calculateFloatingPnl(trade), 0);
+  };
+
+  // Filter trade history based on selected filter
+  const getFilteredHistory = () => {
+    const now = new Date();
+    return closedTrades.filter(trade => {
+      const tradeDate = new Date(trade.closedAt || trade.updatedAt);
+      if (historyFilter === 'all') return true;
+      if (historyFilter === 'today') {
+        return tradeDate.toDateString() === now.toDateString();
+      }
+      if (historyFilter === 'week') {
+        const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+        return tradeDate >= weekAgo;
+      }
+      if (historyFilter === 'month') {
+        const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+        return tradeDate >= monthAgo;
+      }
+      if (historyFilter === 'year') {
+        const yearAgo = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000);
+        return tradeDate >= yearAgo;
+      }
+      return true;
+    });
+  };
+
+  // Calculate total P&L for filtered history
+  const getHistoryTotalPnl = () => {
+    return getFilteredHistory().reduce((sum, trade) => sum + (trade.realizedPnl || trade.pnl || 0), 0);
   };
 
   const closeTrade = async (trade) => {
@@ -601,15 +632,58 @@ const OrderBookScreen = ({ navigation }) => {
             )}
 
             {activeTab === 'history' && (
-              closedTrades.length === 0 ? (
-                <View style={styles.emptyState}>
-                  <Ionicons name="document-text-outline" size={48} color={colors.textMuted} />
-                  <Text style={[styles.emptyTitle, { color: colors.textPrimary }]}>No Trade History</Text>
-                  <Text style={[styles.emptyText, { color: colors.textMuted }]}>Your closed trades will appear here</Text>
+              <>
+                {/* History Filter Buttons */}
+                <View style={[styles.historyFilters, { backgroundColor: colors.bgSecondary, borderBottomColor: colors.border }]}>
+                  <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.historyFiltersContent}>
+                    {[
+                      { key: 'all', label: 'All' },
+                      { key: 'today', label: 'Today' },
+                      { key: 'week', label: 'This Week' },
+                      { key: 'month', label: 'This Month' },
+                      { key: 'year', label: 'This Year' }
+                    ].map(filter => (
+                      <TouchableOpacity
+                        key={filter.key}
+                        style={[
+                          styles.historyFilterBtn,
+                          { backgroundColor: historyFilter === filter.key ? '#22c55e' : colors.bgCard }
+                        ]}
+                        onPress={() => setHistoryFilter(filter.key)}
+                      >
+                        <Text style={[
+                          styles.historyFilterText,
+                          { color: historyFilter === filter.key ? '#000' : colors.textMuted }
+                        ]}>
+                          {filter.label}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </ScrollView>
                 </View>
-              ) : (
-                closedTrades.slice(0, 50).map(trade => renderHistoryItem(trade))
-              )
+                
+                {/* History Summary */}
+                <View style={[styles.historySummary, { backgroundColor: colors.bgCard, borderBottomColor: colors.border }]}>
+                  <Text style={[styles.historySummaryText, { color: colors.textMuted }]}>
+                    {getFilteredHistory().length} trades
+                  </Text>
+                  <Text style={[styles.historySummaryText, { color: colors.textMuted }]}>
+                    P&L: <Text style={{ color: getHistoryTotalPnl() >= 0 ? '#22c55e' : '#ef4444', fontWeight: '600' }}>
+                      ${getHistoryTotalPnl().toFixed(2)}
+                    </Text>
+                  </Text>
+                </View>
+
+                {getFilteredHistory().length === 0 ? (
+                  <View style={styles.emptyState}>
+                    <Ionicons name="document-text-outline" size={48} color={colors.textMuted} />
+                    <Text style={[styles.emptyTitle, { color: colors.textPrimary }]}>No Trade History</Text>
+                    <Text style={[styles.emptyText, { color: colors.textMuted }]}>Your closed trades will appear here</Text>
+                  </View>
+                ) : (
+                  getFilteredHistory().slice(0, 50).map(trade => renderHistoryItem(trade))
+                )}
+              </>
             )}
           </>
         )}
@@ -828,6 +902,13 @@ const styles = StyleSheet.create({
     fontSize: 12,
     textAlign: 'right',
   },
+  // History Filters
+  historyFilters: { paddingVertical: 8, borderBottomWidth: 1 },
+  historyFiltersContent: { paddingHorizontal: 12, gap: 8, flexDirection: 'row' },
+  historyFilterBtn: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 16 },
+  historyFilterText: { fontSize: 12, fontWeight: '500' },
+  historySummary: { flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 12, paddingVertical: 8, borderBottomWidth: 1 },
+  historySummaryText: { fontSize: 12 },
 });
 
 export default OrderBookScreen;
