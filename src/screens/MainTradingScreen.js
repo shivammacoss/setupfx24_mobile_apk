@@ -122,164 +122,13 @@ const toastStyles = StyleSheet.create({
 
 const useToast = () => React.useContext(ToastContext);
 
-// Default instruments - matching web version (AllTick API symbols)
+// Default instruments - fallback only, will be replaced by API data
 const defaultInstruments = [
-  // ========== FOREX MAJORS (7) ==========
+  // Minimal fallback - actual instruments fetched from backend API
   { symbol: 'EURUSD', name: 'EUR/USD', bid: 0, ask: 0, spread: 0, category: 'Forex', starred: true },
   { symbol: 'GBPUSD', name: 'GBP/USD', bid: 0, ask: 0, spread: 0, category: 'Forex', starred: true },
-  { symbol: 'USDJPY', name: 'USD/JPY', bid: 0, ask: 0, spread: 0, category: 'Forex', starred: false },
-  { symbol: 'USDCHF', name: 'USD/CHF', bid: 0, ask: 0, spread: 0, category: 'Forex', starred: false },
-  { symbol: 'AUDUSD', name: 'AUD/USD', bid: 0, ask: 0, spread: 0, category: 'Forex', starred: false },
-  { symbol: 'NZDUSD', name: 'NZD/USD', bid: 0, ask: 0, spread: 0, category: 'Forex', starred: false },
-  { symbol: 'USDCAD', name: 'USD/CAD', bid: 0, ask: 0, spread: 0, category: 'Forex', starred: false },
-  // ========== FOREX CROSSES (21) ==========
-  { symbol: 'EURGBP', name: 'EUR/GBP', bid: 0, ask: 0, spread: 0, category: 'Forex', starred: false },
-  { symbol: 'EURJPY', name: 'EUR/JPY', bid: 0, ask: 0, spread: 0, category: 'Forex', starred: false },
-  { symbol: 'GBPJPY', name: 'GBP/JPY', bid: 0, ask: 0, spread: 0, category: 'Forex', starred: false },
-  { symbol: 'EURCHF', name: 'EUR/CHF', bid: 0, ask: 0, spread: 0, category: 'Forex', starred: false },
-  { symbol: 'EURAUD', name: 'EUR/AUD', bid: 0, ask: 0, spread: 0, category: 'Forex', starred: false },
-  { symbol: 'EURCAD', name: 'EUR/CAD', bid: 0, ask: 0, spread: 0, category: 'Forex', starred: false },
-  { symbol: 'GBPAUD', name: 'GBP/AUD', bid: 0, ask: 0, spread: 0, category: 'Forex', starred: false },
-  { symbol: 'GBPCAD', name: 'GBP/CAD', bid: 0, ask: 0, spread: 0, category: 'Forex', starred: false },
-  { symbol: 'AUDCAD', name: 'AUD/CAD', bid: 0, ask: 0, spread: 0, category: 'Forex', starred: false },
-  { symbol: 'AUDJPY', name: 'AUD/JPY', bid: 0, ask: 0, spread: 0, category: 'Forex', starred: false },
-  { symbol: 'CADJPY', name: 'CAD/JPY', bid: 0, ask: 0, spread: 0, category: 'Forex', starred: false },
-  { symbol: 'CHFJPY', name: 'CHF/JPY', bid: 0, ask: 0, spread: 0, category: 'Forex', starred: false },
-  { symbol: 'NZDJPY', name: 'NZD/JPY', bid: 0, ask: 0, spread: 0, category: 'Forex', starred: false },
-  { symbol: 'AUDNZD', name: 'AUD/NZD', bid: 0, ask: 0, spread: 0, category: 'Forex', starred: false },
-  { symbol: 'CADCHF', name: 'CAD/CHF', bid: 0, ask: 0, spread: 0, category: 'Forex', starred: false },
-  { symbol: 'GBPCHF', name: 'GBP/CHF', bid: 0, ask: 0, spread: 0, category: 'Forex', starred: false },
-  { symbol: 'GBPNZD', name: 'GBP/NZD', bid: 0, ask: 0, spread: 0, category: 'Forex', starred: false },
-  { symbol: 'EURNZD', name: 'EUR/NZD', bid: 0, ask: 0, spread: 0, category: 'Forex', starred: false },
-  { symbol: 'NZDCAD', name: 'NZD/CAD', bid: 0, ask: 0, spread: 0, category: 'Forex', starred: false },
-  { symbol: 'NZDCHF', name: 'NZD/CHF', bid: 0, ask: 0, spread: 0, category: 'Forex', starred: false },
-  { symbol: 'AUDCHF', name: 'AUD/CHF', bid: 0, ask: 0, spread: 0, category: 'Forex', starred: false },
-  // ========== FOREX EXOTICS (36) ==========
-  { symbol: 'USDSGD', name: 'USD/SGD', bid: 0, ask: 0, spread: 0, category: 'Forex', starred: false },
-  { symbol: 'EURSGD', name: 'EUR/SGD', bid: 0, ask: 0, spread: 0, category: 'Forex', starred: false },
-  { symbol: 'GBPSGD', name: 'GBP/SGD', bid: 0, ask: 0, spread: 0, category: 'Forex', starred: false },
-  { symbol: 'AUDSGD', name: 'AUD/SGD', bid: 0, ask: 0, spread: 0, category: 'Forex', starred: false },
-  { symbol: 'SGDJPY', name: 'SGD/JPY', bid: 0, ask: 0, spread: 0, category: 'Forex', starred: false },
-  { symbol: 'USDHKD', name: 'USD/HKD', bid: 0, ask: 0, spread: 0, category: 'Forex', starred: false },
-  { symbol: 'USDZAR', name: 'USD/ZAR', bid: 0, ask: 0, spread: 0, category: 'Forex', starred: false },
-  { symbol: 'EURZAR', name: 'EUR/ZAR', bid: 0, ask: 0, spread: 0, category: 'Forex', starred: false },
-  { symbol: 'GBPZAR', name: 'GBP/ZAR', bid: 0, ask: 0, spread: 0, category: 'Forex', starred: false },
-  { symbol: 'ZARJPY', name: 'ZAR/JPY', bid: 0, ask: 0, spread: 0, category: 'Forex', starred: false },
-  { symbol: 'USDTRY', name: 'USD/TRY', bid: 0, ask: 0, spread: 0, category: 'Forex', starred: false },
-  { symbol: 'EURTRY', name: 'EUR/TRY', bid: 0, ask: 0, spread: 0, category: 'Forex', starred: false },
-  { symbol: 'TRYJPY', name: 'TRY/JPY', bid: 0, ask: 0, spread: 0, category: 'Forex', starred: false },
-  { symbol: 'USDMXN', name: 'USD/MXN', bid: 0, ask: 0, spread: 0, category: 'Forex', starred: false },
-  { symbol: 'EURMXN', name: 'EUR/MXN', bid: 0, ask: 0, spread: 0, category: 'Forex', starred: false },
-  { symbol: 'MXNJPY', name: 'MXN/JPY', bid: 0, ask: 0, spread: 0, category: 'Forex', starred: false },
-  { symbol: 'USDPLN', name: 'USD/PLN', bid: 0, ask: 0, spread: 0, category: 'Forex', starred: false },
-  { symbol: 'EURPLN', name: 'EUR/PLN', bid: 0, ask: 0, spread: 0, category: 'Forex', starred: false },
-  { symbol: 'GBPPLN', name: 'GBP/PLN', bid: 0, ask: 0, spread: 0, category: 'Forex', starred: false },
-  { symbol: 'USDSEK', name: 'USD/SEK', bid: 0, ask: 0, spread: 0, category: 'Forex', starred: false },
-  { symbol: 'EURSEK', name: 'EUR/SEK', bid: 0, ask: 0, spread: 0, category: 'Forex', starred: false },
-  { symbol: 'GBPSEK', name: 'GBP/SEK', bid: 0, ask: 0, spread: 0, category: 'Forex', starred: false },
-  { symbol: 'SEKJPY', name: 'SEK/JPY', bid: 0, ask: 0, spread: 0, category: 'Forex', starred: false },
-  { symbol: 'USDNOK', name: 'USD/NOK', bid: 0, ask: 0, spread: 0, category: 'Forex', starred: false },
-  { symbol: 'EURNOK', name: 'EUR/NOK', bid: 0, ask: 0, spread: 0, category: 'Forex', starred: false },
-  { symbol: 'GBPNOK', name: 'GBP/NOK', bid: 0, ask: 0, spread: 0, category: 'Forex', starred: false },
-  { symbol: 'NOKJPY', name: 'NOK/JPY', bid: 0, ask: 0, spread: 0, category: 'Forex', starred: false },
-  { symbol: 'USDDKK', name: 'USD/DKK', bid: 0, ask: 0, spread: 0, category: 'Forex', starred: false },
-  { symbol: 'EURDKK', name: 'EUR/DKK', bid: 0, ask: 0, spread: 0, category: 'Forex', starred: false },
-  { symbol: 'DKKJPY', name: 'DKK/JPY', bid: 0, ask: 0, spread: 0, category: 'Forex', starred: false },
-  { symbol: 'USDCNH', name: 'USD/CNH', bid: 0, ask: 0, spread: 0, category: 'Forex', starred: false },
-  { symbol: 'CNHJPY', name: 'CNH/JPY', bid: 0, ask: 0, spread: 0, category: 'Forex', starred: false },
-  { symbol: 'USDHUF', name: 'USD/HUF', bid: 0, ask: 0, spread: 0, category: 'Forex', starred: false },
-  { symbol: 'EURHUF', name: 'EUR/HUF', bid: 0, ask: 0, spread: 0, category: 'Forex', starred: false },
-  { symbol: 'USDCZK', name: 'USD/CZK', bid: 0, ask: 0, spread: 0, category: 'Forex', starred: false },
-  { symbol: 'EURCZK', name: 'EUR/CZK', bid: 0, ask: 0, spread: 0, category: 'Forex', starred: false },
-  // ========== METALS (4) ==========
   { symbol: 'XAUUSD', name: 'Gold', bid: 0, ask: 0, spread: 0, category: 'Metals', starred: true },
-  { symbol: 'XAGUSD', name: 'Silver', bid: 0, ask: 0, spread: 0, category: 'Metals', starred: false },
-  { symbol: 'XPTUSD', name: 'Platinum', bid: 0, ask: 0, spread: 0, category: 'Metals', starred: false },
-  { symbol: 'XPDUSD', name: 'Palladium', bid: 0, ask: 0, spread: 0, category: 'Metals', starred: false },
-  // ========== COMMODITIES (6) ==========
-  { symbol: 'USOIL', name: 'US Oil', bid: 0, ask: 0, spread: 0, category: 'Commodities', starred: false },
-  { symbol: 'UKOIL', name: 'UK Oil', bid: 0, ask: 0, spread: 0, category: 'Commodities', starred: false },
-  { symbol: 'NGAS', name: 'Natural Gas', bid: 0, ask: 0, spread: 0, category: 'Commodities', starred: false },
-  { symbol: 'COPPER', name: 'Copper', bid: 0, ask: 0, spread: 0, category: 'Commodities', starred: false },
-  { symbol: 'ALUMINUM', name: 'Aluminum', bid: 0, ask: 0, spread: 0, category: 'Commodities', starred: false },
-  { symbol: 'NICKEL', name: 'Nickel', bid: 0, ask: 0, spread: 0, category: 'Commodities', starred: false },
-  // ========== CRYPTO (50+ popular coins) ==========
   { symbol: 'BTCUSD', name: 'Bitcoin', bid: 0, ask: 0, spread: 0, category: 'Crypto', starred: true },
-  { symbol: 'ETHUSD', name: 'Ethereum', bid: 0, ask: 0, spread: 0, category: 'Crypto', starred: false },
-  { symbol: 'BNBUSD', name: 'BNB', bid: 0, ask: 0, spread: 0, category: 'Crypto', starred: false },
-  { symbol: 'SOLUSD', name: 'Solana', bid: 0, ask: 0, spread: 0, category: 'Crypto', starred: false },
-  { symbol: 'XRPUSD', name: 'XRP', bid: 0, ask: 0, spread: 0, category: 'Crypto', starred: false },
-  { symbol: 'ADAUSD', name: 'Cardano', bid: 0, ask: 0, spread: 0, category: 'Crypto', starred: false },
-  { symbol: 'DOGEUSD', name: 'Dogecoin', bid: 0, ask: 0, spread: 0, category: 'Crypto', starred: false },
-  { symbol: 'TRXUSD', name: 'Tron', bid: 0, ask: 0, spread: 0, category: 'Crypto', starred: false },
-  { symbol: 'LINKUSD', name: 'Chainlink', bid: 0, ask: 0, spread: 0, category: 'Crypto', starred: false },
-  { symbol: 'MATICUSD', name: 'Polygon', bid: 0, ask: 0, spread: 0, category: 'Crypto', starred: false },
-  { symbol: 'DOTUSD', name: 'Polkadot', bid: 0, ask: 0, spread: 0, category: 'Crypto', starred: false },
-  { symbol: 'SHIBUSD', name: 'Shiba Inu', bid: 0, ask: 0, spread: 0, category: 'Crypto', starred: false },
-  { symbol: 'LTCUSD', name: 'Litecoin', bid: 0, ask: 0, spread: 0, category: 'Crypto', starred: false },
-  { symbol: 'BCHUSD', name: 'Bitcoin Cash', bid: 0, ask: 0, spread: 0, category: 'Crypto', starred: false },
-  { symbol: 'AVAXUSD', name: 'Avalanche', bid: 0, ask: 0, spread: 0, category: 'Crypto', starred: false },
-  { symbol: 'XLMUSD', name: 'Stellar', bid: 0, ask: 0, spread: 0, category: 'Crypto', starred: false },
-  { symbol: 'UNIUSD', name: 'Uniswap', bid: 0, ask: 0, spread: 0, category: 'Crypto', starred: false },
-  { symbol: 'ATOMUSD', name: 'Cosmos', bid: 0, ask: 0, spread: 0, category: 'Crypto', starred: false },
-  { symbol: 'ETCUSD', name: 'Ethereum Classic', bid: 0, ask: 0, spread: 0, category: 'Crypto', starred: false },
-  { symbol: 'FILUSD', name: 'Filecoin', bid: 0, ask: 0, spread: 0, category: 'Crypto', starred: false },
-  { symbol: 'ICPUSD', name: 'Internet Computer', bid: 0, ask: 0, spread: 0, category: 'Crypto', starred: false },
-  { symbol: 'VETUSD', name: 'VeChain', bid: 0, ask: 0, spread: 0, category: 'Crypto', starred: false },
-  { symbol: 'NEARUSD', name: 'NEAR Protocol', bid: 0, ask: 0, spread: 0, category: 'Crypto', starred: false },
-  { symbol: 'GRTUSD', name: 'The Graph', bid: 0, ask: 0, spread: 0, category: 'Crypto', starred: false },
-  { symbol: 'AAVEUSD', name: 'Aave', bid: 0, ask: 0, spread: 0, category: 'Crypto', starred: false },
-  { symbol: 'MKRUSD', name: 'Maker', bid: 0, ask: 0, spread: 0, category: 'Crypto', starred: false },
-  { symbol: 'ALGOUSD', name: 'Algorand', bid: 0, ask: 0, spread: 0, category: 'Crypto', starred: false },
-  { symbol: 'FTMUSD', name: 'Fantom', bid: 0, ask: 0, spread: 0, category: 'Crypto', starred: false },
-  { symbol: 'SANDUSD', name: 'The Sandbox', bid: 0, ask: 0, spread: 0, category: 'Crypto', starred: false },
-  { symbol: 'MANAUSD', name: 'Decentraland', bid: 0, ask: 0, spread: 0, category: 'Crypto', starred: false },
-  { symbol: 'AXSUSD', name: 'Axie Infinity', bid: 0, ask: 0, spread: 0, category: 'Crypto', starred: false },
-  { symbol: 'THETAUSD', name: 'Theta', bid: 0, ask: 0, spread: 0, category: 'Crypto', starred: false },
-  { symbol: 'XMRUSD', name: 'Monero', bid: 0, ask: 0, spread: 0, category: 'Crypto', starred: false },
-  { symbol: 'FLOWUSD', name: 'Flow', bid: 0, ask: 0, spread: 0, category: 'Crypto', starred: false },
-  { symbol: 'SNXUSD', name: 'Synthetix', bid: 0, ask: 0, spread: 0, category: 'Crypto', starred: false },
-  { symbol: 'EOSUSD', name: 'EOS', bid: 0, ask: 0, spread: 0, category: 'Crypto', starred: false },
-  { symbol: 'CHZUSD', name: 'Chiliz', bid: 0, ask: 0, spread: 0, category: 'Crypto', starred: false },
-  { symbol: 'ENJUSD', name: 'Enjin Coin', bid: 0, ask: 0, spread: 0, category: 'Crypto', starred: false },
-  { symbol: 'ZILUSD', name: 'Zilliqa', bid: 0, ask: 0, spread: 0, category: 'Crypto', starred: false },
-  { symbol: 'BATUSD', name: 'Basic Attention Token', bid: 0, ask: 0, spread: 0, category: 'Crypto', starred: false },
-  { symbol: 'CRVUSD', name: 'Curve', bid: 0, ask: 0, spread: 0, category: 'Crypto', starred: false },
-  { symbol: 'COMPUSD', name: 'Compound', bid: 0, ask: 0, spread: 0, category: 'Crypto', starred: false },
-  { symbol: 'SUSHIUSD', name: 'SushiSwap', bid: 0, ask: 0, spread: 0, category: 'Crypto', starred: false },
-  { symbol: 'ZRXUSD', name: '0x', bid: 0, ask: 0, spread: 0, category: 'Crypto', starred: false },
-  { symbol: 'LRCUSD', name: 'Loopring', bid: 0, ask: 0, spread: 0, category: 'Crypto', starred: false },
-  { symbol: 'ANKRUSD', name: 'Ankr', bid: 0, ask: 0, spread: 0, category: 'Crypto', starred: false },
-  { symbol: 'GALAUSD', name: 'Gala', bid: 0, ask: 0, spread: 0, category: 'Crypto', starred: false },
-  { symbol: 'APEUSD', name: 'ApeCoin', bid: 0, ask: 0, spread: 0, category: 'Crypto', starred: false },
-  { symbol: 'WAVESUSD', name: 'Waves', bid: 0, ask: 0, spread: 0, category: 'Crypto', starred: false },
-  { symbol: 'ZECUSD', name: 'Zcash', bid: 0, ask: 0, spread: 0, category: 'Crypto', starred: false },
-  { symbol: 'PEPEUSD', name: 'Pepe', bid: 0, ask: 0, spread: 0, category: 'Crypto', starred: false },
-  { symbol: 'ARBUSD', name: 'Arbitrum', bid: 0, ask: 0, spread: 0, category: 'Crypto', starred: false },
-  { symbol: 'OPUSD', name: 'Optimism', bid: 0, ask: 0, spread: 0, category: 'Crypto', starred: false },
-  { symbol: 'SUIUSD', name: 'Sui', bid: 0, ask: 0, spread: 0, category: 'Crypto', starred: false },
-  { symbol: 'APTUSD', name: 'Aptos', bid: 0, ask: 0, spread: 0, category: 'Crypto', starred: false },
-  { symbol: 'INJUSD', name: 'Injective', bid: 0, ask: 0, spread: 0, category: 'Crypto', starred: false },
-  { symbol: 'LDOUSD', name: 'Lido DAO', bid: 0, ask: 0, spread: 0, category: 'Crypto', starred: false },
-  { symbol: 'IMXUSD', name: 'Immutable X', bid: 0, ask: 0, spread: 0, category: 'Crypto', starred: false },
-  { symbol: 'RUNEUSD', name: 'THORChain', bid: 0, ask: 0, spread: 0, category: 'Crypto', starred: false },
-  { symbol: 'KAVAUSD', name: 'Kava', bid: 0, ask: 0, spread: 0, category: 'Crypto', starred: false },
-  { symbol: 'KSMUSD', name: 'Kusama', bid: 0, ask: 0, spread: 0, category: 'Crypto', starred: false },
-  { symbol: 'NEOUSD', name: 'NEO', bid: 0, ask: 0, spread: 0, category: 'Crypto', starred: false },
-  { symbol: 'QNTUSD', name: 'Quant', bid: 0, ask: 0, spread: 0, category: 'Crypto', starred: false },
-  { symbol: 'FETUSD', name: 'Fetch.ai', bid: 0, ask: 0, spread: 0, category: 'Crypto', starred: false },
-  { symbol: 'RNDRUSD', name: 'Render', bid: 0, ask: 0, spread: 0, category: 'Crypto', starred: false },
-  { symbol: 'OCEANUSD', name: 'Ocean Protocol', bid: 0, ask: 0, spread: 0, category: 'Crypto', starred: false },
-  { symbol: 'WLDUSD', name: 'Worldcoin', bid: 0, ask: 0, spread: 0, category: 'Crypto', starred: false },
-  { symbol: 'SEIUSD', name: 'Sei', bid: 0, ask: 0, spread: 0, category: 'Crypto', starred: false },
-  { symbol: 'TIAUSD', name: 'Celestia', bid: 0, ask: 0, spread: 0, category: 'Crypto', starred: false },
-  { symbol: 'BLURUSD', name: 'Blur', bid: 0, ask: 0, spread: 0, category: 'Crypto', starred: false },
-  { symbol: 'TONUSD', name: 'Toncoin', bid: 0, ask: 0, spread: 0, category: 'Crypto', starred: false },
-  { symbol: 'HBARUSD', name: 'Hedera', bid: 0, ask: 0, spread: 0, category: 'Crypto', starred: false },
-  { symbol: '1INCHUSD', name: '1inch', bid: 0, ask: 0, spread: 0, category: 'Crypto', starred: false },
-  { symbol: 'BONKUSD', name: 'Bonk', bid: 0, ask: 0, spread: 0, category: 'Crypto', starred: false },
-  { symbol: 'FLOKIUSD', name: 'Floki', bid: 0, ask: 0, spread: 0, category: 'Crypto', starred: false },
-  { symbol: 'ORDIUSD', name: 'Ordinals', bid: 0, ask: 0, spread: 0, category: 'Crypto', starred: false },
 ];
 
 // Shared context for trading data
@@ -308,6 +157,7 @@ const TradingProvider = ({ children, navigation, route }) => {
 
   useEffect(() => {
     loadUser();
+    fetchInstrumentsFromAPI(); // Fetch instruments from backend API
   }, []);
 
   useEffect(() => {
@@ -316,6 +166,32 @@ const TradingProvider = ({ children, navigation, route }) => {
       fetchChallengeAccounts(user._id);
     }
   }, [user]);
+
+  // Fetch instruments from backend API (Infoway)
+  const fetchInstrumentsFromAPI = async () => {
+    try {
+      const res = await fetch(`${API_URL}/prices/instruments`);
+      const data = await res.json();
+      if (data.success && data.instruments?.length > 0) {
+        // Map API instruments to app format with starred defaults
+        const starredSymbols = ['EURUSD', 'GBPUSD', 'XAUUSD', 'BTCUSD'];
+        const mappedInstruments = data.instruments.map(inst => ({
+          symbol: inst.symbol,
+          name: inst.name,
+          bid: 0,
+          ask: 0,
+          spread: 0,
+          category: inst.category,
+          starred: starredSymbols.includes(inst.symbol)
+        }));
+        setInstruments(mappedInstruments);
+        console.log('[Mobile] Loaded', mappedInstruments.length, 'instruments from API');
+      }
+    } catch (e) {
+      console.error('[Mobile] Error fetching instruments:', e);
+      // Keep default instruments on error
+    }
+  };
 
   // Handle selectedAccountId from navigation params (when coming from AccountsScreen)
   useEffect(() => {
