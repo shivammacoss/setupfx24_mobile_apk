@@ -323,24 +323,37 @@ const TradingProvider = ({ children, navigation, route }) => {
     // Connect to WebSocket
     socketService.connect();
     
+    // Use refs to accumulate prices without triggering re-renders
+    const priceBuffer = {};
+    let updateScheduled = false;
+    
     // Subscribe to price updates via WebSocket
     const unsubscribe = socketService.addPriceListener((prices) => {
       if (prices && Object.keys(prices).length > 0) {
-        setLivePrices(prev => {
-          const merged = { ...prev };
-          Object.entries(prices).forEach(([symbol, price]) => {
-            if (price && price.bid) merged[symbol] = price;
-          });
-          return merged;
+        // Accumulate prices in buffer (no state update yet)
+        Object.entries(prices).forEach(([symbol, price]) => {
+          if (price && price.bid) priceBuffer[symbol] = price;
         });
         
-        setInstruments(prev => prev.map(inst => {
-          const price = prices[inst.symbol];
-          if (price && price.bid) {
-            return { ...inst, bid: price.bid, ask: price.ask || price.bid, spread: Math.abs((price.ask || price.bid) - price.bid) };
-          }
-          return inst;
-        }));
+        // Schedule a batched state update (max once per 50ms)
+        if (!updateScheduled) {
+          updateScheduled = true;
+          setTimeout(() => {
+            // Batch update livePrices
+            setLivePrices(prev => ({ ...prev, ...priceBuffer }));
+            
+            // Batch update instruments
+            setInstruments(prev => prev.map(inst => {
+              const price = priceBuffer[inst.symbol];
+              if (price && price.bid) {
+                return { ...inst, bid: price.bid, ask: price.ask || price.bid, spread: Math.abs((price.ask || price.bid) - price.bid) };
+              }
+              return inst;
+            }));
+            
+            updateScheduled = false;
+          }, 50);
+        }
       }
     });
     
