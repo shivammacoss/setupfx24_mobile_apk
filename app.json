@@ -1,0 +1,46 @@
+{
+  "expo": {
+    "name": "SetupFX24",
+    "slug": "setupfx24",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/nfxwhite.png",
+    "userInterfaceStyle": "dark",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/nfxwhite.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#000000"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSAppTransportSecurity": {
+          "NSAllowsArbitraryLoads": true,
+          "NSAllowsLocalNetworking": true
+        }
+      },
+      "bundleIdentifier": "com.setupfx24.app"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/nfxwhite.png",
+        "backgroundColor": "#000000"
+      },
+      "edgeToEdgeEnabled": true,
+      "package": "com.setupfx24.app"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "5a25aefc-a243-492b-b49c-15b17cd13671"
+      }
+    },
+    "owner": "shivam92388",
+    "plugins": [
+      "expo-font"
+    ]
+  }
+}
