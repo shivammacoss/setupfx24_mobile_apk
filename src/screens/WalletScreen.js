@@ -17,6 +17,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import * as SecureStore from 'expo-secure-store';
+import * as Clipboard from 'expo-clipboard';
 import { API_URL } from '../config';
 import { useTheme } from '../context/ThemeContext';
 
@@ -498,29 +499,44 @@ const WalletScreen = ({ navigation }) => {
               <View style={[styles.methodDetails, { backgroundColor: colors.bgSecondary, borderColor: colors.border }]}>
                 {selectedMethod.type === 'Bank Transfer' && (
                   <>
-                    <Text style={styles.detailRow}>
-                      <Text style={[styles.detailLabel, { color: colors.textMuted }]}>Bank: </Text>
-                      <Text style={[styles.detailValue, { color: colors.textPrimary }]}>{selectedMethod.bankName}</Text>
-                    </Text>
-                    <Text style={styles.detailRow}>
-                      <Text style={[styles.detailLabel, { color: colors.textMuted }]}>Account: </Text>
-                      <Text style={[styles.detailValue, { color: colors.textPrimary }]}>{selectedMethod.accountNumber}</Text>
-                    </Text>
-                    <Text style={styles.detailRow}>
-                      <Text style={[styles.detailLabel, { color: colors.textMuted }]}>Name: </Text>
-                      <Text style={[styles.detailValue, { color: colors.textPrimary }]}>{selectedMethod.accountHolderName}</Text>
-                    </Text>
-                    <Text style={styles.detailRow}>
-                      <Text style={[styles.detailLabel, { color: colors.textMuted }]}>IFSC: </Text>
-                      <Text style={[styles.detailValue, { color: colors.textPrimary }]}>{selectedMethod.ifscCode}</Text>
-                    </Text>
+                    <TouchableOpacity style={styles.copyRow} onPress={() => { Clipboard.setStringAsync(selectedMethod.bankName); Alert.alert('Copied', 'Bank name copied!'); }}>
+                      <Text style={styles.detailRow}>
+                        <Text style={[styles.detailLabel, { color: colors.textMuted }]}>Bank: </Text>
+                        <Text style={[styles.detailValue, { color: colors.textPrimary }]}>{selectedMethod.bankName}</Text>
+                      </Text>
+                      <Ionicons name="copy-outline" size={16} color={colors.textMuted} />
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.copyRow} onPress={() => { Clipboard.setStringAsync(selectedMethod.accountNumber); Alert.alert('Copied', 'Account number copied!'); }}>
+                      <Text style={styles.detailRow}>
+                        <Text style={[styles.detailLabel, { color: colors.textMuted }]}>Account: </Text>
+                        <Text style={[styles.detailValue, { color: colors.textPrimary }]}>{selectedMethod.accountNumber}</Text>
+                      </Text>
+                      <Ionicons name="copy-outline" size={16} color={colors.textMuted} />
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.copyRow} onPress={() => { Clipboard.setStringAsync(selectedMethod.accountHolderName); Alert.alert('Copied', 'Name copied!'); }}>
+                      <Text style={styles.detailRow}>
+                        <Text style={[styles.detailLabel, { color: colors.textMuted }]}>Name: </Text>
+                        <Text style={[styles.detailValue, { color: colors.textPrimary }]}>{selectedMethod.accountHolderName}</Text>
+                      </Text>
+                      <Ionicons name="copy-outline" size={16} color={colors.textMuted} />
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.copyRow} onPress={() => { Clipboard.setStringAsync(selectedMethod.ifscCode); Alert.alert('Copied', 'IFSC copied!'); }}>
+                      <Text style={styles.detailRow}>
+                        <Text style={[styles.detailLabel, { color: colors.textMuted }]}>IFSC: </Text>
+                        <Text style={[styles.detailValue, { color: colors.textPrimary }]}>{selectedMethod.ifscCode}</Text>
+                      </Text>
+                      <Ionicons name="copy-outline" size={16} color={colors.textMuted} />
+                    </TouchableOpacity>
                   </>
                 )}
                 {selectedMethod.type === 'UPI' && (
-                  <Text style={styles.detailRow}>
-                    <Text style={[styles.detailLabel, { color: colors.textMuted }]}>UPI ID: </Text>
-                    <Text style={[styles.detailValue, { color: colors.textPrimary }]}>{selectedMethod.upiId}</Text>
-                  </Text>
+                  <TouchableOpacity style={styles.copyRow} onPress={() => { Clipboard.setStringAsync(selectedMethod.upiId); Alert.alert('Copied', 'UPI ID copied!'); }}>
+                    <Text style={styles.detailRow}>
+                      <Text style={[styles.detailLabel, { color: colors.textMuted }]}>UPI ID: </Text>
+                      <Text style={[styles.detailValue, { color: colors.textPrimary }]}>{selectedMethod.upiId}</Text>
+                    </Text>
+                    <Ionicons name="copy-outline" size={16} color={colors.textMuted} />
+                  </TouchableOpacity>
                 )}
                 {selectedMethod.type === 'QR Code' && selectedMethod.qrCodeImage && (
                   <View style={styles.qrContainer}>
@@ -766,6 +782,7 @@ const styles = StyleSheet.create({
   
   // Method details styles
   methodDetails: { borderRadius: 12, padding: 16, marginTop: 12, borderWidth: 1 },
+  copyRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: '#333' },
   detailRow: { marginBottom: 8 },
   detailLabel: { color: '#666', fontSize: 13 },
   detailValue: { fontSize: 13 },
