@@ -323,37 +323,20 @@ const TradingProvider = ({ children, navigation, route }) => {
     // Connect to WebSocket
     socketService.connect();
     
-    // Use refs to accumulate prices without triggering re-renders
-    const priceBuffer = {};
-    let updateScheduled = false;
-    
-    // Subscribe to price updates via WebSocket
+    // Subscribe to price updates via WebSocket - tick-to-tick for fastest updates
     const unsubscribe = socketService.addPriceListener((prices) => {
       if (prices && Object.keys(prices).length > 0) {
-        // Accumulate prices in buffer (no state update yet)
-        Object.entries(prices).forEach(([symbol, price]) => {
-          if (price && price.bid) priceBuffer[symbol] = price;
-        });
+        // Tick-to-tick updates - immediate state update for fastest price display
+        setLivePrices(prev => ({ ...prev, ...prices }));
         
-        // Schedule a batched state update (max once per 50ms)
-        if (!updateScheduled) {
-          updateScheduled = true;
-          setTimeout(() => {
-            // Batch update livePrices
-            setLivePrices(prev => ({ ...prev, ...priceBuffer }));
-            
-            // Batch update instruments
-            setInstruments(prev => prev.map(inst => {
-              const price = priceBuffer[inst.symbol];
-              if (price && price.bid) {
-                return { ...inst, bid: price.bid, ask: price.ask || price.bid, spread: Math.abs((price.ask || price.bid) - price.bid) };
-              }
-              return inst;
-            }));
-            
-            updateScheduled = false;
-          }, 50);
-        }
+        // Update instruments immediately
+        setInstruments(prev => prev.map(inst => {
+          const price = prices[inst.symbol];
+          if (price && price.bid) {
+            return { ...inst, bid: price.bid, ask: price.ask || price.bid, spread: Math.abs((price.ask || price.bid) - price.bid) };
+          }
+          return inst;
+        }));
       }
     });
     
@@ -627,21 +610,8 @@ const TradingProvider = ({ children, navigation, route }) => {
     return pnl - (trade.commission || 0) - (trade.swap || 0);
   };
 
-  // Use state for real-time values to trigger re-renders
-  const [realTimeValues, setRealTimeValues] = useState({
-    totalFloatingPnl: 0,
-    realTimeEquity: 0,
-    realTimeFreeMargin: 0,
-    totalUsedMargin: 0,
-    todayPnl: 0,
-    // Challenge account specific real-time values
-    realTimeDailyDD: 0,
-    realTimeOverallDD: 0,
-    realTimeProfit: 0
-  });
-
-  // Update real-time values when prices or trades change
-  useEffect(() => {
+  // Use useMemo for real-time values to avoid infinite loops
+  const realTimeValues = React.useMemo(() => {
     // Use challenge account balance when in challenge mode, fallback to accountSummary
     const activeAccount = isChallengeMode ? selectedChallengeAccount : selectedAccount;
     const balance = accountSummary.balance || activeAccount?.balance || 0;
@@ -694,7 +664,7 @@ const TradingProvider = ({ children, navigation, route }) => {
       realTimeProfit = ((equity - initialBalance) / initialBalance) * 100;
     }
 
-    setRealTimeValues({
+    return {
       totalFloatingPnl: Math.round(totalPnl * 100) / 100,
       realTimeEquity: Math.round(equity * 100) / 100,
       realTimeFreeMargin: Math.round(freeMargin * 100) / 100,
@@ -703,7 +673,7 @@ const TradingProvider = ({ children, navigation, route }) => {
       realTimeDailyDD: Math.round(realTimeDailyDD * 100) / 100,
       realTimeOverallDD: Math.round(realTimeOverallDD * 100) / 100,
       realTimeProfit: Math.round(realTimeProfit * 100) / 100
-    });
+    };
   }, [livePrices, openTrades, accountSummary, tradeHistory, isChallengeMode, selectedChallengeAccount, selectedAccount]);
 
   const { totalFloatingPnl, realTimeEquity, realTimeFreeMargin, totalUsedMargin, todayPnl, realTimeDailyDD, realTimeOverallDD, realTimeProfit } = realTimeValues;
