@@ -2452,8 +2452,41 @@ const TradeTab = () => {
   const [detailTrade, setDetailTrade] = useState(null);
   const [showHistoryDetails, setShowHistoryDetails] = useState(false);
   const [historyDetailTrade, setHistoryDetailTrade] = useState(null);
+  
+  // History filter states
+  const [historyFilter, setHistoryFilter] = useState('all');
 
   const totalUsedMargin = ctx.openTrades.reduce((sum, trade) => sum + (trade.marginUsed || 0), 0);
+  
+  // Filter trade history based on selected filter
+  const getFilteredHistory = () => {
+    const now = new Date();
+    return ctx.tradeHistory.filter(trade => {
+      const tradeDate = new Date(trade.closedAt);
+      if (historyFilter === 'all') return true;
+      if (historyFilter === 'today') {
+        return tradeDate.toDateString() === now.toDateString();
+      }
+      if (historyFilter === 'week') {
+        const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+        return tradeDate >= weekAgo;
+      }
+      if (historyFilter === 'month') {
+        const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+        return tradeDate >= monthAgo;
+      }
+      if (historyFilter === 'year') {
+        const yearAgo = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000);
+        return tradeDate >= yearAgo;
+      }
+      return true;
+    });
+  };
+
+  // Calculate total P&L for filtered history
+  const getHistoryTotalPnl = () => {
+    return getFilteredHistory().reduce((sum, trade) => sum + (trade.realizedPnl || 0), 0);
+  };
 
   // Calculate PnL for a trade
   const calculatePnl = (trade) => {
@@ -2842,39 +2875,82 @@ const TradeTab = () => {
         )}
 
         {tradeTab === 'history' && (
-          ctx.tradeHistory.length === 0 ? (
-            <View style={styles.emptyState}>
-              <Ionicons name="document-text-outline" size={48} color={colors.textMuted} />
-              <Text style={[styles.emptyText, { color: colors.textMuted }]}>No trade history</Text>
+          <>
+            {/* History Filter Buttons */}
+            <View style={[styles.historyFilters, { backgroundColor: colors.bgSecondary, borderBottomColor: colors.border }]}>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.historyFiltersContent}>
+                {[
+                  { key: 'all', label: 'All' },
+                  { key: 'today', label: 'Today' },
+                  { key: 'week', label: 'This Week' },
+                  { key: 'month', label: 'This Month' },
+                  { key: 'year', label: 'This Year' }
+                ].map(filter => (
+                  <TouchableOpacity
+                    key={filter.key}
+                    style={[
+                      styles.historyFilterBtn,
+                      { backgroundColor: historyFilter === filter.key ? '#22c55e' : colors.bgCard }
+                    ]}
+                    onPress={() => setHistoryFilter(filter.key)}
+                  >
+                    <Text style={[
+                      styles.historyFilterText,
+                      { color: historyFilter === filter.key ? '#000' : colors.textMuted }
+                    ]}>
+                      {filter.label}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
             </View>
-          ) : (
-            ctx.tradeHistory.map(trade => (
-              <TouchableOpacity 
-                key={trade._id} 
-                style={[styles.historyItem, { backgroundColor: colors.bgCard, borderBottomColor: colors.border }]}
-                onPress={() => { setHistoryDetailTrade(trade); setShowHistoryDetails(true); }}
-              >
-                <View style={styles.historyHeader}>
-                  <View style={styles.historyLeft}>
-                    <Text style={[styles.historySymbol, { color: colors.textPrimary }]}>{trade.symbol}</Text>
-                    <Text style={[styles.historySide, { color: trade.side === 'BUY' ? '#22c55e' : '#ef4444' }]}>{trade.side}</Text>
-                    {trade.closedBy === 'ADMIN' && (
-                      <View style={styles.adminBadge}>
-                        <Text style={styles.adminBadgeText}>Admin Close</Text>
-                      </View>
-                    )}
+            
+            {/* History Summary */}
+            <View style={[styles.historySummary, { backgroundColor: colors.bgCard, borderBottomColor: colors.border }]}>
+              <Text style={[styles.historySummaryText, { color: colors.textMuted }]}>
+                {getFilteredHistory().length} trades
+              </Text>
+              <Text style={[styles.historySummaryText, { color: colors.textMuted }]}>
+                P&L: <Text style={{ color: getHistoryTotalPnl() >= 0 ? '#22c55e' : '#ef4444', fontWeight: '600' }}>
+                  ${getHistoryTotalPnl().toFixed(2)}
+                </Text>
+              </Text>
+            </View>
+
+            {getFilteredHistory().length === 0 ? (
+              <View style={styles.emptyState}>
+                <Ionicons name="document-text-outline" size={48} color={colors.textMuted} />
+                <Text style={[styles.emptyText, { color: colors.textMuted }]}>No trade history</Text>
+              </View>
+            ) : (
+              getFilteredHistory().map(trade => (
+                <TouchableOpacity 
+                  key={trade._id} 
+                  style={[styles.historyItem, { backgroundColor: colors.bgCard, borderBottomColor: colors.border }]}
+                  onPress={() => { setHistoryDetailTrade(trade); setShowHistoryDetails(true); }}
+                >
+                  <View style={styles.historyHeader}>
+                    <View style={styles.historyLeft}>
+                      <Text style={[styles.historySymbol, { color: colors.textPrimary }]}>{trade.symbol}</Text>
+                      <Text style={[styles.historySide, { color: trade.side === 'BUY' ? '#22c55e' : '#ef4444' }]}>{trade.side}</Text>
+                      {trade.closedBy === 'ADMIN' && (
+                        <View style={styles.adminBadge}>
+                          <Text style={styles.adminBadgeText}>Admin Close</Text>
+                        </View>
+                      )}
+                    </View>
+                    <Text style={[styles.historyPnl, { color: (trade.realizedPnl || 0) >= 0 ? '#22c55e' : '#ef4444' }]}>
+                      {(trade.realizedPnl || 0) >= 0 ? '+' : ''}${(trade.realizedPnl || 0).toFixed(2)}
+                    </Text>
                   </View>
-                  <Text style={[styles.historyPnl, { color: (trade.realizedPnl || 0) >= 0 ? '#22c55e' : '#ef4444' }]}>
-                    {(trade.realizedPnl || 0) >= 0 ? '+' : ''}${(trade.realizedPnl || 0).toFixed(2)}
-                  </Text>
-                </View>
-                <View style={styles.historyDetails}>
-                  <Text style={[styles.historyDetail, { color: colors.textMuted }]}>{trade.quantity} lots</Text>
-                  <Text style={[styles.historyDetail, { color: colors.textMuted }]}>{new Date(trade.closedAt).toLocaleDateString()}</Text>
-                </View>
-              </TouchableOpacity>
-            ))
-          )
+                  <View style={styles.historyDetails}>
+                    <Text style={[styles.historyDetail, { color: colors.textMuted }]}>{trade.quantity} lots</Text>
+                    <Text style={[styles.historyDetail, { color: colors.textMuted }]}>{new Date(trade.closedAt).toLocaleDateString()}</Text>
+                  </View>
+                </TouchableOpacity>
+              ))
+            )}
+          </>
         )}
       </ScrollView>
 
@@ -4830,6 +4906,14 @@ const styles = StyleSheet.create({
   historyDetail: { color: '#666', fontSize: 12 },
   adminBadge: { backgroundColor: '#dc262620', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 4 },
   adminBadgeText: { color: '#dc2626', fontSize: 10 },
+  
+  // History Filters
+  historyFilters: { paddingVertical: 8, borderBottomWidth: 1 },
+  historyFiltersContent: { paddingHorizontal: 12, gap: 8, flexDirection: 'row' },
+  historyFilterBtn: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 16 },
+  historyFilterText: { fontSize: 12, fontWeight: '500' },
+  historySummary: { flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 12, paddingVertical: 8, borderBottomWidth: 1 },
+  historySummaryText: { fontSize: 12 },
   
   // More Menu - Matching screenshot
   moreMenuHeader: { paddingTop: 60, paddingHorizontal: 20, paddingBottom: 20 },

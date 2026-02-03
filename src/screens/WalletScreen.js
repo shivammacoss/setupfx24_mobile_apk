@@ -337,25 +337,47 @@ const WalletScreen = ({ navigation }) => {
             </View>
           ) : (
             transactions.map((tx) => {
-              const isDeposit = tx.type === 'DEPOSIT' || tx.type === 'Deposit';
+              const isPositive = tx.type === 'DEPOSIT' || tx.type === 'Deposit' || tx.type === 'Admin_Fund_Add' || tx.type === 'Admin_Credit_Add' || tx.type === 'Transfer_From_Account' || tx.type === 'Account_Transfer_In';
+              const getTypeLabel = (type) => {
+                switch(type) {
+                  case 'Admin_Fund_Add': return 'Admin Fund Addition';
+                  case 'Admin_Credit_Add': return 'Admin Credit Addition';
+                  case 'Admin_Credit_Remove': return 'Admin Credit Removal';
+                  case 'Transfer_To_Account': return 'To Trading Account';
+                  case 'Transfer_From_Account': return 'From Trading Account';
+                  case 'Account_Transfer_Out': return 'Account Transfer (Out)';
+                  case 'Account_Transfer_In': return 'Account Transfer (In)';
+                  case 'Challenge_Purchase': return 'Challenge Purchase';
+                  default: return type;
+                }
+              };
+              const getIcon = (type) => {
+                if (type === 'Admin_Fund_Add' || type === 'Admin_Credit_Add') return 'gift';
+                if (type === 'Transfer_To_Account') return 'send';
+                if (type === 'Transfer_From_Account') return 'download';
+                if (isPositive) return 'arrow-down';
+                return 'arrow-up';
+              };
               return (
                 <View key={tx._id} style={[styles.transactionItem, { backgroundColor: colors.bgCard }]}>
                   <View style={styles.txLeft}>
-                    <View style={[styles.txIcon, { backgroundColor: isDeposit ? colors.success + '20' : colors.error + '20' }]}>
+                    <View style={[styles.txIcon, { backgroundColor: isPositive ? colors.success + '20' : colors.error + '20' }]}>
                       <Ionicons 
-                        name={isDeposit ? 'arrow-down' : 'arrow-up'} 
+                        name={getIcon(tx.type)} 
                         size={20} 
-                        color={isDeposit ? colors.success : colors.error} 
+                        color={isPositive ? colors.success : colors.error} 
                       />
                     </View>
                     <View>
-                      <Text style={[styles.txType, { color: colors.textPrimary }]}>{tx.type}</Text>
+                      <Text style={[styles.txType, { color: colors.textPrimary }]}>{getTypeLabel(tx.type)}</Text>
+                      {tx.tradingAccountName && <Text style={[styles.txDate, { color: colors.textMuted }]}>{tx.tradingAccountName}</Text>}
+                      {tx.description && (tx.type === 'Admin_Fund_Add' || tx.type === 'Admin_Credit_Add') && <Text style={[styles.txDate, { color: colors.textMuted }]}>{tx.description}</Text>}
                       <Text style={[styles.txDate, { color: colors.textMuted }]}>{formatDate(tx.createdAt)}</Text>
                     </View>
                   </View>
                   <View style={styles.txRight}>
-                    <Text style={[styles.txAmount, { color: isDeposit ? colors.success : colors.error }]}>
-                      {isDeposit ? '+' : '-'}${tx.amount?.toLocaleString()}
+                    <Text style={[styles.txAmount, { color: isPositive ? colors.success : colors.error }]}>
+                      {isPositive ? '+' : '-'}${tx.amount?.toLocaleString()}
                     </Text>
                     <View style={[styles.statusBadge, { backgroundColor: getStatusColor(tx.status) + '20' }]}>
                       <Text style={[styles.statusText, { color: getStatusColor(tx.status) }]}>{tx.status}</Text>
