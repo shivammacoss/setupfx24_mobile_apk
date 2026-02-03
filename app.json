@@ -4,11 +4,11 @@
     "slug": "setupfx24",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/nfxwhite.png",
+    "icon": "./assets/SetupFX.png",
     "userInterfaceStyle": "dark",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/nfxwhite.png",
+      "image": "./assets/SetupFX.png",
       "resizeMode": "contain",
       "backgroundColor": "#000000"
     },
@@ -24,7 +24,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/nfxwhite.png",
+        "foregroundImage": "./assets/SetupFX.png",
         "backgroundColor": "#000000"
       },
       "edgeToEdgeEnabled": true,

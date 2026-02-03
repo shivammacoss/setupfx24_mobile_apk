@@ -122,7 +122,7 @@ const LoginScreen = ({ navigation }) => {
         {/* Logo */}
         <View style={styles.logoContainer}>
           <Image 
-            source={require('../../assets/nfx.png')} 
+            source={require('../../assets/SetupFX.png')} 
             style={styles.logoImage}
             resizeMode="contain"
           />
