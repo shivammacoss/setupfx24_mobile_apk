@@ -3,14 +3,21 @@
     "name": "SetupFX24",
     "slug": "setupfx24",
     "version": "1.0.0",
+    "runtimeVersion": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/SetupFX.png",
+    "icon": "./assets/setupfxicon.png",
     "userInterfaceStyle": "dark",
     "newArchEnabled": true,
     "splash": {
       "image": "./assets/SetupFX.png",
       "resizeMode": "contain",
       "backgroundColor": "#000000"
+    },
+    "updates": {
+      "enabled": true,
+      "checkAutomatically": "ON_LOAD",
+      "fallbackToCacheTimeout": 0,
+      "url": "https://u.expo.dev/b998437a-a10b-49c5-8e51-020efdc57111"
     },
     "ios": {
       "supportsTablet": true,
@@ -24,8 +31,8 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#000000"
+        "foregroundImage": "./assets/setupfxicon.png",
+        "backgroundColor": "#FFFFFF"
       },
       "edgeToEdgeEnabled": true,
       "package": "com.setupfx24.app"
@@ -40,7 +47,8 @@
     },
     "owner": "shivam92388",
     "plugins": [
-      "expo-font"
+      "expo-font",
+      "expo-updates"
     ]
   }
 }

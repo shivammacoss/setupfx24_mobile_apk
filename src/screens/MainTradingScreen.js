@@ -3186,44 +3186,44 @@ const TradeTab = () => {
       <Modal visible={showHistoryDetails} animationType="slide" transparent onRequestClose={() => setShowHistoryDetails(false)}>
         <View style={styles.slTpModalOverlay}>
           <TouchableOpacity style={styles.slTpModalBackdrop} activeOpacity={1} onPress={() => setShowHistoryDetails(false)} />
-          <View style={styles.tradeDetailsContent}>
-            <View style={styles.slTpModalHandle} />
+          <View style={[styles.tradeDetailsContent, { backgroundColor: colors.bgCard }]}>
+            <View style={[styles.slTpModalHandle, { backgroundColor: colors.border }]} />
             <View style={styles.slTpModalHeader}>
-              <Text style={styles.slTpModalTitle}>{historyDetailTrade?.symbol} - Closed Trade</Text>
+              <Text style={[styles.slTpModalTitle, { color: colors.textPrimary }]}>{historyDetailTrade?.symbol} - Closed Trade</Text>
               <TouchableOpacity onPress={() => setShowHistoryDetails(false)}>
-                <Ionicons name="close" size={24} color="#fff" />
+                <Ionicons name="close" size={24} color={colors.textPrimary} />
               </TouchableOpacity>
             </View>
             
             {historyDetailTrade && (
               <ScrollView style={styles.tradeDetailsScroll}>
                 {/* Trade Info */}
-                <View style={styles.detailSection}>
-                  <Text style={styles.detailSectionTitle}>Trade Info</Text>
-                  <View style={styles.detailRow}>
-                    <Text style={styles.detailLabel}>Trade ID</Text>
-                    <Text style={styles.detailValue}>{historyDetailTrade.tradeId}</Text>
+                <View style={[styles.detailSection, { backgroundColor: colors.bgSecondary }]}>
+                  <Text style={[styles.detailSectionTitle, { color: colors.primary }]}>Trade Info</Text>
+                  <View style={[styles.detailRow, { borderBottomColor: colors.border }]}>
+                    <Text style={[styles.detailLabel, { color: colors.textMuted }]}>Trade ID</Text>
+                    <Text style={[styles.detailValue, { color: colors.textPrimary }]}>{historyDetailTrade.tradeId}</Text>
                   </View>
-                  <View style={styles.detailRow}>
-                    <Text style={styles.detailLabel}>Status</Text>
-                    <Text style={[styles.detailValue, { color: '#888' }]}>{historyDetailTrade.status}</Text>
+                  <View style={[styles.detailRow, { borderBottomColor: colors.border }]}>
+                    <Text style={[styles.detailLabel, { color: colors.textMuted }]}>Status</Text>
+                    <Text style={[styles.detailValue, { color: colors.textMuted }]}>{historyDetailTrade.status}</Text>
                   </View>
-                  <View style={styles.detailRow}>
-                    <Text style={styles.detailLabel}>Side</Text>
-                    <Text style={[styles.detailValue, { color: historyDetailTrade.side === 'BUY' ? '#dc2626' : '#dc2626' }]}>{historyDetailTrade.side}</Text>
+                  <View style={[styles.detailRow, { borderBottomColor: colors.border }]}>
+                    <Text style={[styles.detailLabel, { color: colors.textMuted }]}>Side</Text>
+                    <Text style={[styles.detailValue, { color: historyDetailTrade.side === 'BUY' ? '#22c55e' : '#ef4444' }]}>{historyDetailTrade.side}</Text>
                   </View>
-                  <View style={styles.detailRow}>
-                    <Text style={styles.detailLabel}>Order Type</Text>
-                    <Text style={styles.detailValue}>{historyDetailTrade.orderType}</Text>
+                  <View style={[styles.detailRow, { borderBottomColor: colors.border }]}>
+                    <Text style={[styles.detailLabel, { color: colors.textMuted }]}>Order Type</Text>
+                    <Text style={[styles.detailValue, { color: colors.textPrimary }]}>{historyDetailTrade.orderType}</Text>
                   </View>
                   {/* Closed By - Show for all close types */}
-                  <View style={styles.detailRow}>
-                    <Text style={styles.detailLabel}>Closed By</Text>
+                  <View style={[styles.detailRow, { borderBottomColor: colors.border }]}>
+                    <Text style={[styles.detailLabel, { color: colors.textMuted }]}>Closed By</Text>
                     <Text style={[styles.detailValue, { 
                       color: historyDetailTrade.closedBy === 'STOP_OUT' ? '#ef4444' : 
                              historyDetailTrade.closedBy === 'SL' ? '#ef4444' : 
                              historyDetailTrade.closedBy === 'TP' ? '#22c55e' : 
-                             historyDetailTrade.closedBy === 'ADMIN' ? '#f59e0b' : '#888'
+                             historyDetailTrade.closedBy === 'ADMIN' ? '#f59e0b' : colors.textMuted
                     }]}>
                       {historyDetailTrade.closedBy === 'STOP_OUT' ? '⚠️ Stop Out (Equity Zero)' :
                        historyDetailTrade.closedBy === 'SL' ? '🔴 Stop Loss Hit' :
@@ -3236,73 +3236,73 @@ const TradeTab = () => {
                 </View>
 
                 {/* Position Details */}
-                <View style={styles.detailSection}>
-                  <Text style={styles.detailSectionTitle}>Position</Text>
-                  <View style={styles.detailRow}>
-                    <Text style={styles.detailLabel}>Volume</Text>
-                    <Text style={styles.detailValue}>{historyDetailTrade.quantity} lots</Text>
+                <View style={[styles.detailSection, { backgroundColor: colors.bgSecondary }]}>
+                  <Text style={[styles.detailSectionTitle, { color: colors.primary }]}>Position</Text>
+                  <View style={[styles.detailRow, { borderBottomColor: colors.border }]}>
+                    <Text style={[styles.detailLabel, { color: colors.textMuted }]}>Volume</Text>
+                    <Text style={[styles.detailValue, { color: colors.textPrimary }]}>{historyDetailTrade.quantity} lots</Text>
                   </View>
-                  <View style={styles.detailRow}>
-                    <Text style={styles.detailLabel}>Open Price</Text>
-                    <Text style={styles.detailValue}>{historyDetailTrade.openPrice?.toFixed(5)}</Text>
+                  <View style={[styles.detailRow, { borderBottomColor: colors.border }]}>
+                    <Text style={[styles.detailLabel, { color: colors.textMuted }]}>Open Price</Text>
+                    <Text style={[styles.detailValue, { color: colors.textPrimary }]}>{historyDetailTrade.openPrice?.toFixed(5)}</Text>
                   </View>
-                  <View style={styles.detailRow}>
-                    <Text style={styles.detailLabel}>Close Price</Text>
-                    <Text style={styles.detailValue}>{historyDetailTrade.closePrice?.toFixed(5)}</Text>
+                  <View style={[styles.detailRow, { borderBottomColor: colors.border }]}>
+                    <Text style={[styles.detailLabel, { color: colors.textMuted }]}>Close Price</Text>
+                    <Text style={[styles.detailValue, { color: colors.textPrimary }]}>{historyDetailTrade.closePrice?.toFixed(5)}</Text>
                   </View>
-                  <View style={styles.detailRow}>
-                    <Text style={styles.detailLabel}>Contract Size</Text>
-                    <Text style={styles.detailValue}>{historyDetailTrade.contractSize?.toLocaleString()}</Text>
+                  <View style={[styles.detailRow, { borderBottomColor: colors.border }]}>
+                    <Text style={[styles.detailLabel, { color: colors.textMuted }]}>Contract Size</Text>
+                    <Text style={[styles.detailValue, { color: colors.textPrimary }]}>{historyDetailTrade.contractSize?.toLocaleString()}</Text>
                   </View>
-                  <View style={styles.detailRow}>
-                    <Text style={styles.detailLabel}>Leverage</Text>
-                    <Text style={styles.detailValue}>1:{historyDetailTrade.leverage}</Text>
+                  <View style={[styles.detailRow, { borderBottomColor: colors.border }]}>
+                    <Text style={[styles.detailLabel, { color: colors.textMuted }]}>Leverage</Text>
+                    <Text style={[styles.detailValue, { color: colors.textPrimary }]}>1:{historyDetailTrade.leverage}</Text>
                   </View>
                 </View>
 
                 {/* SL/TP */}
-                <View style={styles.detailSection}>
-                  <Text style={styles.detailSectionTitle}>Stop Loss / Take Profit</Text>
-                  <View style={styles.detailRow}>
-                    <Text style={styles.detailLabel}>Stop Loss</Text>
-                    <Text style={[styles.detailValue, { color: (historyDetailTrade.sl || historyDetailTrade.stopLoss) ? '#dc2626' : '#666' }]}>
+                <View style={[styles.detailSection, { backgroundColor: colors.bgSecondary }]}>
+                  <Text style={[styles.detailSectionTitle, { color: colors.primary }]}>Stop Loss / Take Profit</Text>
+                  <View style={[styles.detailRow, { borderBottomColor: colors.border }]}>
+                    <Text style={[styles.detailLabel, { color: colors.textMuted }]}>Stop Loss</Text>
+                    <Text style={[styles.detailValue, { color: (historyDetailTrade.sl || historyDetailTrade.stopLoss) ? '#dc2626' : colors.textMuted }]}>
                       {historyDetailTrade.sl || historyDetailTrade.stopLoss || 'Not Set'}
                     </Text>
                   </View>
-                  <View style={styles.detailRow}>
-                    <Text style={styles.detailLabel}>Take Profit</Text>
-                    <Text style={[styles.detailValue, { color: (historyDetailTrade.tp || historyDetailTrade.takeProfit) ? '#22c55e' : '#666' }]}>
+                  <View style={[styles.detailRow, { borderBottomColor: colors.border }]}>
+                    <Text style={[styles.detailLabel, { color: colors.textMuted }]}>Take Profit</Text>
+                    <Text style={[styles.detailValue, { color: (historyDetailTrade.tp || historyDetailTrade.takeProfit) ? '#22c55e' : colors.textMuted }]}>
                       {historyDetailTrade.tp || historyDetailTrade.takeProfit || 'Not Set'}
                     </Text>
                   </View>
                 </View>
 
                 {/* Charges */}
-                <View style={styles.detailSection}>
-                  <Text style={styles.detailSectionTitle}>Charges</Text>
-                  <View style={styles.detailRow}>
-                    <Text style={styles.detailLabel}>Margin Used</Text>
-                    <Text style={styles.detailValue}>${historyDetailTrade.marginUsed?.toFixed(2) || '0.00'}</Text>
+                <View style={[styles.detailSection, { backgroundColor: colors.bgSecondary }]}>
+                  <Text style={[styles.detailSectionTitle, { color: colors.primary }]}>Charges</Text>
+                  <View style={[styles.detailRow, { borderBottomColor: colors.border }]}>
+                    <Text style={[styles.detailLabel, { color: colors.textMuted }]}>Margin Used</Text>
+                    <Text style={[styles.detailValue, { color: colors.textPrimary }]}>${historyDetailTrade.marginUsed?.toFixed(2) || '0.00'}</Text>
                   </View>
-                  <View style={styles.detailRow}>
-                    <Text style={styles.detailLabel}>Spread</Text>
-                    <Text style={styles.detailValue}>{historyDetailTrade.spread || 0} pips</Text>
+                  <View style={[styles.detailRow, { borderBottomColor: colors.border }]}>
+                    <Text style={[styles.detailLabel, { color: colors.textMuted }]}>Spread</Text>
+                    <Text style={[styles.detailValue, { color: colors.textPrimary }]}>{historyDetailTrade.spread || 0} pips</Text>
                   </View>
-                  <View style={styles.detailRow}>
-                    <Text style={styles.detailLabel}>Commission</Text>
-                    <Text style={styles.detailValue}>${historyDetailTrade.commission?.toFixed(2) || '0.00'}</Text>
+                  <View style={[styles.detailRow, { borderBottomColor: colors.border }]}>
+                    <Text style={[styles.detailLabel, { color: colors.textMuted }]}>Commission</Text>
+                    <Text style={[styles.detailValue, { color: colors.textPrimary }]}>${historyDetailTrade.commission?.toFixed(2) || '0.00'}</Text>
                   </View>
-                  <View style={styles.detailRow}>
-                    <Text style={styles.detailLabel}>Swap</Text>
-                    <Text style={styles.detailValue}>${historyDetailTrade.swap?.toFixed(2) || '0.00'}</Text>
+                  <View style={[styles.detailRow, { borderBottomColor: colors.border }]}>
+                    <Text style={[styles.detailLabel, { color: colors.textMuted }]}>Swap</Text>
+                    <Text style={[styles.detailValue, { color: colors.textPrimary }]}>${historyDetailTrade.swap?.toFixed(2) || '0.00'}</Text>
                   </View>
                 </View>
 
                 {/* P&L */}
-                <View style={styles.detailSection}>
-                  <Text style={styles.detailSectionTitle}>Realized Profit & Loss</Text>
-                  <View style={styles.detailRow}>
-                    <Text style={styles.detailLabel}>Realized P&L</Text>
+                <View style={[styles.detailSection, { backgroundColor: colors.bgSecondary }]}>
+                  <Text style={[styles.detailSectionTitle, { color: colors.primary }]}>Realized Profit & Loss</Text>
+                  <View style={[styles.detailRow, { borderBottomColor: colors.border }]}>
+                    <Text style={[styles.detailLabel, { color: colors.textMuted }]}>Realized P&L</Text>
                     <Text style={[styles.detailValue, { color: (historyDetailTrade.realizedPnl || 0) >= 0 ? '#22c55e' : '#ef4444', fontWeight: 'bold', fontSize: 18 }]}>
                       {(historyDetailTrade.realizedPnl || 0) >= 0 ? '+' : ''}${(historyDetailTrade.realizedPnl || 0).toFixed(2)}
                     </Text>
@@ -3310,19 +3310,19 @@ const TradeTab = () => {
                 </View>
 
                 {/* Time */}
-                <View style={styles.detailSection}>
-                  <Text style={styles.detailSectionTitle}>Time</Text>
-                  <View style={styles.detailRow}>
-                    <Text style={styles.detailLabel}>Opened At</Text>
-                    <Text style={styles.detailValue}>{new Date(historyDetailTrade.openedAt || historyDetailTrade.createdAt).toLocaleString()}</Text>
+                <View style={[styles.detailSection, { backgroundColor: colors.bgSecondary }]}>
+                  <Text style={[styles.detailSectionTitle, { color: colors.primary }]}>Time</Text>
+                  <View style={[styles.detailRow, { borderBottomColor: colors.border }]}>
+                    <Text style={[styles.detailLabel, { color: colors.textMuted }]}>Opened At</Text>
+                    <Text style={[styles.detailValue, { color: colors.textPrimary }]}>{new Date(historyDetailTrade.openedAt || historyDetailTrade.createdAt).toLocaleString()}</Text>
                   </View>
-                  <View style={styles.detailRow}>
-                    <Text style={styles.detailLabel}>Closed At</Text>
-                    <Text style={styles.detailValue}>{new Date(historyDetailTrade.closedAt).toLocaleString()}</Text>
+                  <View style={[styles.detailRow, { borderBottomColor: colors.border }]}>
+                    <Text style={[styles.detailLabel, { color: colors.textMuted }]}>Closed At</Text>
+                    <Text style={[styles.detailValue, { color: colors.textPrimary }]}>{new Date(historyDetailTrade.closedAt).toLocaleString()}</Text>
                   </View>
-                  <View style={styles.detailRow}>
-                    <Text style={styles.detailLabel}>Duration</Text>
-                    <Text style={styles.detailValue}>
+                  <View style={[styles.detailRow, { borderBottomColor: colors.border }]}>
+                    <Text style={[styles.detailLabel, { color: colors.textMuted }]}>Duration</Text>
+                    <Text style={[styles.detailValue, { color: colors.textPrimary }]}>
                       {(() => {
                         const openTime = new Date(historyDetailTrade.openedAt || historyDetailTrade.createdAt);
                         const closeTime = new Date(historyDetailTrade.closedAt);
