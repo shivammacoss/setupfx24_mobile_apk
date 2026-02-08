@@ -1788,7 +1788,9 @@ const QuotesTab = ({ navigation }) => {
     return ctx.instruments.filter(inst => {
       const matchesSearch = inst.symbol.toLowerCase().includes(searchTerm.toLowerCase()) ||
         inst.name.toLowerCase().includes(searchTerm.toLowerCase());
-      return inst.category === segment && matchesSearch;
+      // Map 'Energy' from backend to 'Commodities' segment in app
+      const instCategory = inst.category === 'Energy' ? 'Commodities' : inst.category;
+      return instCategory === segment && matchesSearch;
     });
   };
 

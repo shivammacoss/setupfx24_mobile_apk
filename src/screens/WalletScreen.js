@@ -18,6 +18,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import * as SecureStore from 'expo-secure-store';
 import * as Clipboard from 'expo-clipboard';
+import * as ImagePicker from 'expo-image-picker';
 import { API_URL } from '../config';
 import { useTheme } from '../context/ThemeContext';
 
@@ -39,6 +40,8 @@ const WalletScreen = ({ navigation }) => {
   const [currencies, setCurrencies] = useState([]);
   const [selectedCurrency, setSelectedCurrency] = useState({ currency: 'USD', symbol: '$', rateToUSD: 1, markup: 0 });
   const [loadingMethods, setLoadingMethods] = useState(false);
+  const [screenshot, setScreenshot] = useState(null);
+  const [screenshotPreview, setScreenshotPreview] = useState(null);
   
   // Withdrawal bank/UPI details
   const [bankDetails, setBankDetails] = useState({
@@ -129,6 +132,30 @@ const WalletScreen = ({ navigation }) => {
     setLoadingMethods(false);
   };
 
+  const pickScreenshot = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Permission Required', 'Please allow access to your photo library to upload payment screenshots.');
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images'],
+      allowsEditing: false,
+      quality: 0.8,
+    });
+
+    if (!result.canceled && result.assets[0]) {
+      const asset = result.assets[0];
+      if (asset.fileSize && asset.fileSize > 5 * 1024 * 1024) {
+        Alert.alert('Error', 'Screenshot must be less than 5MB');
+        return;
+      }
+      setScreenshot(asset);
+      setScreenshotPreview(asset.uri);
+    }
+  };
+
   const handleDeposit = async () => {
     if (!localAmount || parseFloat(localAmount) <= 0) {
       Alert.alert('Error', 'Please enter a valid amount');
@@ -150,6 +177,27 @@ const WalletScreen = ({ navigation }) => {
 
     setIsSubmitting(true);
     try {
+      // Upload screenshot first if provided
+      let screenshotUrl = null;
+      if (screenshot) {
+        const formData = new FormData();
+        formData.append('screenshot', {
+          uri: screenshot.uri,
+          type: screenshot.mimeType || 'image/jpeg',
+          name: screenshot.fileName || `screenshot_${Date.now()}.jpg`,
+        });
+        formData.append('userId', user._id);
+
+        const uploadRes = await fetch(`${API_URL}/upload/screenshot`, {
+          method: 'POST',
+          body: formData,
+        });
+        const uploadData = await uploadRes.json();
+        if (uploadData.success) {
+          screenshotUrl = uploadData.url;
+        }
+      }
+
       const res = await fetch(`${API_URL}/wallet/deposit`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -163,6 +211,7 @@ const WalletScreen = ({ navigation }) => {
           markup: selectedCurrency?.markup || 0,
           paymentMethod: selectedMethod.type || selectedMethod.name,
           transactionRef,
+          screenshot: screenshotUrl || screenshotPreview,
         })
       });
       const data = await res.json();
@@ -174,6 +223,8 @@ const WalletScreen = ({ navigation }) => {
         setTransactionRef('');
         setSelectedMethod(null);
         setSelectedCurrency({ currency: 'USD', symbol: '$', rateToUSD: 1, markup: 0 });
+        setScreenshot(null);
+        setScreenshotPreview(null);
         fetchWalletData();
       } else {
         Alert.alert('Error', data.message || 'Failed to submit deposit');
@@ -559,6 +610,33 @@ const WalletScreen = ({ navigation }) => {
               placeholder="Enter transaction ID or reference"
               placeholderTextColor={colors.textMuted}
             />
+
+            {/* Payment Screenshot Upload */}
+            <Text style={[styles.inputLabel, { color: colors.textMuted }]}>Payment Screenshot (Proof)</Text>
+            {screenshotPreview ? (
+              <View style={{ marginBottom: 16 }}>
+                <Image 
+                  source={{ uri: screenshotPreview }} 
+                  style={{ width: '100%', height: 200, borderRadius: 8, borderWidth: 1, borderColor: colors.border }}
+                  resizeMode="contain"
+                />
+                <TouchableOpacity
+                  onPress={() => { setScreenshot(null); setScreenshotPreview(null); }}
+                  style={{ position: 'absolute', top: 8, right: 8, backgroundColor: '#ef4444', borderRadius: 12, width: 24, height: 24, alignItems: 'center', justifyContent: 'center' }}
+                >
+                  <Ionicons name="close" size={14} color="#fff" />
+                </TouchableOpacity>
+              </View>
+            ) : (
+              <TouchableOpacity
+                onPress={pickScreenshot}
+                style={{ marginBottom: 16, padding: 20, borderWidth: 2, borderStyle: 'dashed', borderColor: colors.border, borderRadius: 8, alignItems: 'center', gap: 8 }}
+              >
+                <Ionicons name="cloud-upload-outline" size={28} color={colors.textMuted} />
+                <Text style={{ color: colors.textMuted, fontSize: 14 }}>Tap to upload payment screenshot</Text>
+                <Text style={{ color: colors.textMuted, fontSize: 11, opacity: 0.6 }}>PNG, JPG up to 5MB</Text>
+              </TouchableOpacity>
+            )}
 
             <TouchableOpacity 
               style={[styles.submitBtn, { backgroundColor: colors.accent }, isSubmitting && styles.submitBtnDisabled]} 
