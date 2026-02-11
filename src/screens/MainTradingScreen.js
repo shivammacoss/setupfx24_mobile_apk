@@ -1224,22 +1224,59 @@ const HomeTab = ({ navigation }) => {
             </View>
           </View>
 
-          {/* Deposit/Withdraw Buttons inside card */}
+          {/* Deposit/Withdraw or Reset Buttons inside card */}
           <View style={styles.cardActionButtons}>
-            <TouchableOpacity 
-              style={[styles.depositBtn, { backgroundColor: colors.primary }]}
-              onPress={() => parentNav?.navigate('Accounts', { action: 'deposit', accountId: ctx.selectedAccount?._id })}
-            >
-              <Ionicons name="arrow-down-circle-outline" size={16} color="#fff" />
-              <Text style={styles.depositBtnText}>Deposit</Text>
-            </TouchableOpacity>
-            <TouchableOpacity 
-              style={[styles.withdrawBtn, { backgroundColor: colors.bgSecondary, borderColor: colors.border }]}
-              onPress={() => parentNav?.navigate('Accounts', { action: 'withdraw', accountId: ctx.selectedAccount?._id })}
-            >
-              <Ionicons name="arrow-up-circle-outline" size={16} color={colors.textPrimary} />
-              <Text style={[styles.withdrawBtnText, { color: colors.textPrimary }]}>Withdraw</Text>
-            </TouchableOpacity>
+            {ctx.selectedAccount?.isDemo || ctx.selectedAccount?.accountTypeId?.isDemo ? (
+              <TouchableOpacity 
+                style={[styles.depositBtn, { backgroundColor: '#eab308', flex: 1 }]}
+                onPress={() => {
+                  Alert.alert(
+                    'Reset Demo Account',
+                    'Are you sure you want to reset this demo account? All open trades will be closed and balance will be reset.',
+                    [
+                      { text: 'Cancel', style: 'cancel' },
+                      { text: 'Reset', style: 'destructive', onPress: async () => {
+                        try {
+                          const res = await fetch(`${API_URL}/trading-accounts/${ctx.selectedAccount._id}/reset-demo`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' }
+                          });
+                          const data = await res.json();
+                          if (data.success) {
+                            Alert.alert('Success', data.message || 'Demo account reset successfully!');
+                            ctx.refreshAccounts?.();
+                          } else {
+                            Alert.alert('Error', data.message || 'Failed to reset demo account');
+                          }
+                        } catch (error) {
+                          Alert.alert('Error', 'Error resetting demo account');
+                        }
+                      }}
+                    ]
+                  );
+                }}
+              >
+                <Ionicons name="refresh-outline" size={16} color="#000" />
+                <Text style={[styles.depositBtnText, { color: '#000' }]}>Reset</Text>
+              </TouchableOpacity>
+            ) : (
+              <>
+                <TouchableOpacity 
+                  style={[styles.depositBtn, { backgroundColor: colors.primary }]}
+                  onPress={() => parentNav?.navigate('Accounts', { action: 'deposit', accountId: ctx.selectedAccount?._id })}
+                >
+                  <Ionicons name="arrow-down-circle-outline" size={16} color="#fff" />
+                  <Text style={styles.depositBtnText}>Deposit</Text>
+                </TouchableOpacity>
+                <TouchableOpacity 
+                  style={[styles.withdrawBtn, { backgroundColor: colors.bgSecondary, borderColor: colors.border }]}
+                  onPress={() => parentNav?.navigate('Accounts', { action: 'withdraw', accountId: ctx.selectedAccount?._id })}
+                >
+                  <Ionicons name="arrow-up-circle-outline" size={16} color={colors.textPrimary} />
+                  <Text style={[styles.withdrawBtnText, { color: colors.textPrimary }]}>Withdraw</Text>
+                </TouchableOpacity>
+              </>
+            )}
           </View>
         </View>
       )}
